@@ -10,15 +10,6 @@ public class playermovement : MonoBehaviour
         canMove = false;
         yield return new WaitForSeconds(dur);
         canMove = true;
-
-        if (!GroundCheck("p1"))
-        {
-            canMove = false;
-        }
-        else if (GroundCheck("p1"))
-        {
-            canMove = true;
-        }
     }
     public IEnumerator Respawn(int p)
     {
@@ -28,7 +19,8 @@ public class playermovement : MonoBehaviour
             p1.GetComponent<Rigidbody>().velocity = Vector3.zero;
             yield return new WaitForSeconds(0.3f);
             p1.transform.DOMove(p1SpawnPoint, 1);
-            p1.transform.DORotate(new Vector3(-90, 0, 0), 1);
+            p1.transform.DORotate(new Vector3(-90 + 360, 0, 0), 1);
+            yield return new WaitForSeconds(0.5f);
             canMove = true;
         }
         if (p == 2)
@@ -37,33 +29,33 @@ public class playermovement : MonoBehaviour
             yield return new WaitForSeconds(0.3f);
             p2.transform.DOMove(p2SpawnPoint, 1);
             p2.transform.DORotate(new Vector3(-90, 0, 0), 1);
+            yield return new WaitForSeconds(0.5f);
             canMove = true;
         }
         StartCoroutine(TileReset());
         yield return null;
     }
-
-    /*reset tiles. 
-        
+/*
+        Reset Tiles. 
+    ------------------------------------------------------------------------------------------------------
      1.   Log positions of all tiles in Start().
      2.   On player death, Tween all tiles back to their respective starting location, hope it looks cool.   
-        
-
-    */
-    public IEnumerator TileReset()
+    -------------------------------------------------------------------------------------------------------
+*/
+    private IEnumerator TileReset()
     {
         print(tiles[1].transform.position);
         for (int i = 0; i < tiles.Length; i++)
         {
             Vector3 tPos = tiles[i].transform.position;
-            tiles[i].transform.DOMove(new Vector3(tPos.x, 0.5f, tPos.z), 1);
+            tiles[i].transform.DOMove(new Vector3(tPos.x, 0.5f, tPos.z), 0.75f);
             yield return new WaitForSeconds(0.05f);
         }
 
         yield return null;
     }
 
-    public void LogPositions()
+    private void LogPositions()
     {
         //players
         p1SpawnPoint = p1.transform.position;
@@ -90,17 +82,22 @@ public class playermovement : MonoBehaviour
 
     public GameObject[] tiles;
     public Vector3[] tilePos;
-
-    bool running = false;
-
+    
     // Update is called once per frame
     void Update()
     {
+
         if (p1pos.y <= -3) { StartCoroutine(Respawn(1));}
         if (p2pos.y <= -3) { StartCoroutine(Respawn(2));}
 
-
-
+        if (!GroundCheck("p1"))
+        {
+            canMove = false;
+        }
+        else if (GroundCheck("p1"))
+        {
+            canMove = true;
+        }
         p1pos = p1.transform.position;
         p2pos = p2.transform.position;
 
@@ -112,36 +109,58 @@ public class playermovement : MonoBehaviour
 
 
         //movement 
+        PlayerMovement();
+    }
+    void PlayerMovement()
+    {
         if (Input.GetKeyDown(KeyCode.W) && canMove)
         {
-            p1.transform.DOMoveX(p1.transform.position.x - moveIncrement, moveTime);
-            p2.transform.DOMoveX(p2.transform.position.x + moveIncrement, moveTime);
-            StartCoroutine(MoveBuffer(moveTime));
+            Move("f");
         }
-        else if(Input.GetKeyDown(KeyCode.A) && canMove) {
-            p1.transform.DOMoveZ(p1.transform.position.z - moveIncrement, moveTime);
-            p2.transform.DOMoveZ(p2.transform.position.z + moveIncrement, moveTime);
-            StartCoroutine(MoveBuffer(moveTime));
+        else if (Input.GetKeyDown(KeyCode.A) && canMove)
+        {
+            Move("l");
         }
         else if (Input.GetKeyDown(KeyCode.S) && canMove)
         {
-            p1.transform.DOMoveX(p1.transform.position.x + moveIncrement, moveTime);
-            p2.transform.DOMoveX(p2.transform.position.x - moveIncrement, moveTime);
-            StartCoroutine(MoveBuffer(moveTime));
+            Move("b");
         }
         else if (Input.GetKeyDown(KeyCode.D) && canMove)
         {
-            p1.transform.DOMoveZ(p1.transform.position.z + moveIncrement, moveTime);
-            p2.transform.DOMoveZ(p2.transform.position.z - moveIncrement, moveTime);
-            StartCoroutine(MoveBuffer(moveTime));
+            Move("r");
         }
-
-
-
-
     }
+    public void Move(string dir) //f r l b
+    {
+        
+        switch (dir)
+        {
+            case "f":
+                p1.transform.DOMoveX(p1.transform.position.x - moveIncrement, moveTime);
+                p2.transform.DOMoveX(p2.transform.position.x + moveIncrement, moveTime);
+                StartCoroutine(MoveBuffer(moveTime));
+                break;
 
-    public bool GroundCheck(string p)
+            case "r":
+                p1.transform.DOMoveZ(p1.transform.position.z + moveIncrement, moveTime);
+                p2.transform.DOMoveZ(p2.transform.position.z - moveIncrement, moveTime);
+                StartCoroutine(MoveBuffer(moveTime));
+                break;
+
+            case "l":
+                p1.transform.DOMoveZ(p1.transform.position.z - moveIncrement, moveTime);
+                p2.transform.DOMoveZ(p2.transform.position.z + moveIncrement, moveTime);
+                StartCoroutine(MoveBuffer(moveTime));
+                break;
+
+            case "b":
+                p1.transform.DOMoveX(p1.transform.position.x + moveIncrement, moveTime);
+                p2.transform.DOMoveX(p2.transform.position.x - moveIncrement, moveTime);
+                StartCoroutine(MoveBuffer(moveTime));
+                break;
+        }
+    }
+    private bool GroundCheck(string p)
     {
         if (p == "p1")
         {

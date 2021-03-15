@@ -10,6 +10,7 @@ TagManager:
   - RedFin
   - p1
   - p2
+  - CassetteBlock
   layers:
   - Default
   - TransparentFX

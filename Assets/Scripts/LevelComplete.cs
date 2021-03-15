@@ -26,13 +26,20 @@ public class LevelComplete : MonoBehaviour
     }
     public void OnEnable()
     {        
-        SceneManager.sceneLoaded += OnSceneLoaded; //idk why this doesnt work. something about delegates or whatever
+        SceneManager.sceneLoaded += OnSceneLoaded;
         Camera cam = FindObjectOfType<Camera>();
         cam.transform.DOMoveY(5.5f, 1);
     }
     public void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
         StartCoroutine(CamSet());
+        if (GameObject.FindGameObjectsWithTag("CassetteBlock") != null)
+        {
+            FlashingBlock.cassetteBlocks = true;
+        } else
+        {
+            FlashingBlock.cassetteBlocks = false;
+        }
     }
     public IEnumerator CamSet()
     {
