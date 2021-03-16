@@ -1,7 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEditor;
 
 public class playermovement : MonoBehaviour
 {
@@ -11,6 +13,7 @@ public class playermovement : MonoBehaviour
         yield return new WaitForSeconds(dur);
         canMove = true;
     }
+
     public IEnumerator Respawn(int p)
     {
         //seamless respawn
@@ -23,6 +26,7 @@ public class playermovement : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             canMove = true;
         }
+
         if (p == 2)
         {
             p2.GetComponent<Rigidbody>().velocity = Vector3.zero;
@@ -32,9 +36,11 @@ public class playermovement : MonoBehaviour
             yield return new WaitForSeconds(0.5f);
             canMove = true;
         }
+
         StartCoroutine(TileReset());
         yield return null;
     }
+
 /*
         Reset Tiles. 
     ------------------------------------------------------------------------------------------------------
@@ -82,13 +88,19 @@ public class playermovement : MonoBehaviour
 
     public GameObject[] tiles;
     public Vector3[] tilePos;
-    
+
     // Update is called once per frame
     void Update()
     {
+        if (p1pos.y <= -3)
+        {
+            StartCoroutine(Respawn(1));
+        }
 
-        if (p1pos.y <= -3) { StartCoroutine(Respawn(1));}
-        if (p2pos.y <= -3) { StartCoroutine(Respawn(2));}
+        if (p2pos.y <= -3)
+        {
+            StartCoroutine(Respawn(2));
+        }
 
         if (!GroundCheck("p1"))
         {
@@ -98,6 +110,7 @@ public class playermovement : MonoBehaviour
         {
             canMove = true;
         }
+
         p1pos = p1.transform.position;
         p2pos = p2.transform.position;
 
@@ -111,6 +124,7 @@ public class playermovement : MonoBehaviour
         //movement 
         PlayerMovement();
     }
+
     void PlayerMovement()
     {
         if (Input.GetKeyDown(KeyCode.W) && canMove)
@@ -130,9 +144,10 @@ public class playermovement : MonoBehaviour
             Move("r");
         }
     }
+
     public void Move(string dir) //f r l b
     {
-        
+
         switch (dir)
         {
             case "f":
@@ -160,6 +175,7 @@ public class playermovement : MonoBehaviour
                 break;
         }
     }
+
     private bool GroundCheck(string p)
     {
         if (p == "p1")
@@ -177,6 +193,8 @@ public class playermovement : MonoBehaviour
                 return true;
             }
         }
+
         return false;
     }
+
 }
