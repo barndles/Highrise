@@ -45,7 +45,8 @@ public class ScriptManager : MonoBehaviour
         paused = true;
         //set pause ui
         UI.enabled = true;
-        cam.DOOrthoSize(7, 1);
+        cam.DOOrthoSize(6.5f, 0.25f).SetUpdate((true));
+        return;
     }
     public static void Unpause()
     {
@@ -54,7 +55,8 @@ public class ScriptManager : MonoBehaviour
         paused = false;
         //unset pause ui
         UI.enabled = false;
-        cam.DOOrthoSize(6, 1);
+        cam.DOOrthoSize(6, 0.25f).SetUpdate((true));
+        return;
     }
     
     private void Update()
